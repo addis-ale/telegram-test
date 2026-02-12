@@ -18,11 +18,29 @@
    - **Platform** — You **must** select one; choose **Desktop**.
    - **Description** — Optional.
 5. If you still see an error: try in **Incognito/Private** mode, **disable VPN** and **ad blockers**, and use a **more unique short name** (e.g. `mycommerce2025`).
-6. After you create it, Telegram **assigns** you:
+6. **401 Unauthorized** when submitting the form usually means your **session expired**. Log out of my.telegram.org, log in again (phone + code), then open **API development tools** and create the app right away without leaving the page open too long.
+7. After you create it, Telegram **assigns** you:
    - **API ID** — A number (e.g. `12345678`). You **cannot** choose this; copy it.
    - **API Hash** — A long string. You **cannot** choose this; copy it and keep it secret.
 
 ## 2. Install and configure
+
+**Optional but recommended:** create a virtual environment (venv) so project dependencies stay isolated:
+
+```bash
+# Create venv (run from project folder telegram-commerce)
+python -m venv .venv
+
+# Activate it:
+# Git Bash / Linux / macOS:
+source .venv/bin/activate
+# Windows CMD:
+# .venv\Scripts\activate.bat
+# PowerShell:
+# .venv\Scripts\Activate.ps1
+```
+
+Then install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -31,7 +49,14 @@ pip install -r requirements.txt
 Copy the example config and fill in your values:
 
 ```bash
-copy config.example.env config.env
+# Git Bash / Linux / macOS:
+cp config.example.env config.env
+
+# Windows CMD:
+# copy config.example.env config.env
+
+# PowerShell:
+# Copy-Item config.example.env config.env
 ```
 
 Edit `config.env`:

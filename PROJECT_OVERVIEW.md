@@ -28,6 +28,39 @@ We act as a **search layer** on top of Telegram channels; we don’t replace Tel
 
 ---
 
+## How Search Works (What Users Search By)
+
+We store each post’s **text** (and optionally parsed fields). Search runs over that.
+
+| What users do                                | What we use                                                                                                                                             |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Type keywords** in a search box            | **Full-text search** over the stored post content (title/description). E.g. “laptop”, “wireless earbuds”, “sneakers” → we match words in the post text. |
+| **Pick a channel** (e.g. “Only @dagilaptop”) | **Filter** by `channel_username` in the DB.                                                                                                             |
+| **Set price range** (e.g. 100–500)           | **Filter** by a `price` field — only if we **parse** price from the post text (regex or simple rules). Optional.                                        |
+| **Sort by date**                             | **Order** by `post_date` (newest first).                                                                                                                |
+
+So in practice:
+
+- **Main search** = user types a **query** (e.g. “gaming laptop”) → we search the **post text** (and maybe title if we extract it) in our database.
+- **Optional filters** = channel, price range, date.
+- **Result** = list of matching posts; each has a link to the Telegram post (e.g. `t.me/channel/123`).
+
+We don’t have product titles/categories from Telegram — only the message text. So “search by” = **by the words in that text** (and by channel/price/date if we support those filters).
+
+---
+
+## What to Store in the DB
+
+| Table        | What to store                                                                                                                                                                                                                           |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **channels** | `username` (e.g. dagilaptop), `title`, `last_fetched_at`. List of channels you aggregate.                                                                                                                                               |
+| **posts**    | Per post: **channel_id**, **telegram_message_id**, **text** (the message — this is what you search), **posted_at**, **url** (t.me/…), **has_photo**, **has_document**, optional **views**. Unique on (channel_id, telegram_message_id). |
+| **Optional** | **price** (parsed from text), **title** (first line or parsed) for better filters and result display.                                                                                                                                   |
+
+You don’t need to store images (link to Telegram instead). Full schema and rationale: see `docs/DATABASE_SCHEMA.md`.
+
+---
+
 ## Why This Is Feasible
 
 - **Public channels** can be read via Telegram’s **MTProto API** (user client), not the Bot API.

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multiple results – Telegram embed</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        background: #1a1a2e;
+        color: #eee;
+        min-height: 100vh;
+      }
+      h1 {
+        font-size: 1.25rem;
+        color: #7dd3fc;
+        margin-bottom: 0.25rem;
+      }
+      .sub {
+        color: #94a3b8;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+      }
+      .result-card {
+        background: #16213e;
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid #2a2a4a;
+      }
+      .result-card .title {
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+      }
+      .result-card .meta {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-bottom: 0.75rem;
+      }
+      .result-card .actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+      .result-card .actions a,
+      .result-card .actions button {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.75rem;
+        border-radius: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+      }
+      .result-card .actions a {
+        background: #0ea5e9;
+        color: #fff;
+      }
+      .result-card .actions a:hover {
+        background: #0284c7;
+      }
+      .result-card .actions button {
+        background: #334155;
+        color: #cbd5e1;
+      }
+      .result-card .actions button:hover {
+        background: #475569;
+      }
+      .result-card .preview-container {
+        margin-top: 1rem;
+        display: none;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #0f172a;
+      }
+      .result-card .preview-container.open {
+        display: block;
+      }
+      .result-card .preview-container iframe {
+        width: 100%;
+        min-height: 320px;
+        border: none;
+      }
+      .how-it-works {
+        background: #0f172a;
+        border-radius: 10px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        color: #94a3b8;
+      }
+      .how-it-works code {
+        color: #7dd3fc;
+        font-size: 0.85em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Multiple search results + embed</h1>
+    <p class="sub">
+      Each result has a channel and post id. You can show a link and/or embed
+      the post.
+    </p>
+
+    <div class="how-it-works">
+      <strong>How it works:</strong> One post = one embed. For 20 results you
+      have 20 (channel, postId) pairs.<br />
+      <strong>Option A – embed all at once:</strong> Output one script tag per
+      result (same <code>src</code>, different <code>data-telegram-post</code>).
+      Heavy if you have many results.<br />
+      <strong>Option B – on demand:</strong> Show result cards; when user clicks
+      "Preview", show the embed (iframe or script tag). Lighter and faster.
+    </div>
+
+    <!-- Simulated 5 search results (in a real app these come from your API) -->
+    <div id="results"></div>
+
+    <script>
+      // Simulated search results – in your app this comes from your backend
+      const results = [
+        {
+          channel: "dagilaptop",
+          postId: 8318,
+          title: "Laptop deal – Model X",
+          snippet: "From @dagilaptop",
+        },
+        {
+          channel: "dagilaptop",
+          postId: 8317,
+          title: "Gaming laptop offer",
+          snippet: "From @dagilaptop",
+        },
+        {
+          channel: "durov",
+          postId: 123,
+          title: "Sample post from Durov",
+          snippet: "From @durov",
+        },
+        {
+          channel: "telegram",
+          postId: 1,
+          title: "Telegram channel post",
+          snippet: "From @telegram",
+        },
+        {
+          channel: "dagilaptop",
+          postId: 8316,
+          title: "Another product listing",
+          snippet: "From @dagilaptop",
+        },
+      ];
+
+      const container = document.getElementById("results");
+      results.forEach((r, i) => {
+        const card = document.createElement("div");
+        card.className = "result-card";
+        card.innerHTML = `
+        <div class="title">${r.title}</div>
+        <div class="meta">${r.snippet} · Post ${r.postId}</div>
+        <div class="actions">
+          <a href="https://t.me/${r.channel}/${r.postId}" target="_blank" rel="noopener">View on Telegram</a>
+          <button type="button" data-i="${i}">Preview embed</button>
+        </div>
+        <div class="preview-container" id="preview-${i}" data-channel="${r.channel}" data-post="${r.postId}">
+          <iframe src="https://t.me/${r.channel}/${r.postId}?embed=1" title="Telegram post"></iframe>
+        </div>
+      `;
+        container.appendChild(card);
+      });
+
+      document.getElementById("results").addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-i]");
+        if (!btn) return;
+        const i = btn.getAttribute("data-i");
+        const preview = document.getElementById(`preview-${i}`);
+        if (!preview) return;
+        preview.classList.toggle("open");
+        btn.textContent = preview.classList.contains("open")
+          ? "Hide preview"
+          : "Preview embed";
+      });
+    </script>
+  </body>
+</html>
