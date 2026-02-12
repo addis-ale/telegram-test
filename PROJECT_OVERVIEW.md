@@ -49,18 +49,6 @@ We don’t have product titles/categories from Telegram — only the message tex
 
 ---
 
-## What to Store in the DB
-
-| Table        | What to store                                                                                                                                                                                                                           |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **channels** | `username` (e.g. dagilaptop), `title`, `last_fetched_at`. List of channels you aggregate.                                                                                                                                               |
-| **posts**    | Per post: **channel_id**, **telegram_message_id**, **text** (the message — this is what you search), **posted_at**, **url** (t.me/…), **has_photo**, **has_document**, optional **views**. Unique on (channel_id, telegram_message_id). |
-| **Optional** | **price** (parsed from text), **title** (first line or parsed) for better filters and result display.                                                                                                                                   |
-
-You don’t need to store images (link to Telegram instead). Full schema and rationale: see `docs/DATABASE_SCHEMA.md`.
-
----
-
 ## Why This Is Feasible
 
 - **Public channels** can be read via Telegram’s **MTProto API** (user client), not the Bot API.
